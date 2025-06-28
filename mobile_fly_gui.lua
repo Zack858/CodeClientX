@@ -1,97 +1,157 @@
--- Mobile-Compatible Fly Script with Blue GUI
+-- Mobile Fly GUI with Speed Input, Clean Design, and Toggle Button
 
--- Services
+local UIS = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local UIS = game:GetService("UserInputService")
-
--- Player & Character Setup
-local player = Players.LocalPlayer
-local char = player.Character or player.CharacterAdded:Wait()
+local TweenService = game:GetService("TweenService")
+local lp = Players.LocalPlayer
+local char = lp.Character or lp.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
 
--- Variables
 local flying = false
-local speed = 50
+local speedMultiplier = 1
+local speed = 100
 local bv, bg
 
--- GUI Setup
-local gui = Instance.new("ScreenGui")
-gui.Name = "FlyGUI"
-gui.ResetOnSpawn = false
-gui.Parent = game.CoreGui
+local screenGui = Instance.new("ScreenGui", game.CoreGui)
+screenGui.Name = "FlyUI"
+screenGui.ResetOnSpawn = false
 
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 140, 0, 50)
-frame.Position = UDim2.new(1, -160, 1, -110)
-frame.BackgroundColor3 = Color3.fromRGB(0, 102, 255)
-frame.BorderSizePixel = 0
-frame.Active = true
-frame.Draggable = true
-frame.Parent = gui
+local flyFrame = Instance.new("Frame", screenGui)
+flyFrame.Size = UDim2.new(0, 420, 0, 110)
+flyFrame.Position = UDim2.new(1, -440, 1, -130)
+flyFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+flyFrame.Active = true
+flyFrame.Draggable = true
+flyFrame.ZIndex = 2
+Instance.new("UICorner", flyFrame).CornerRadius = UDim.new(0,12)
 
-local corner = Instance.new("UICorner", frame)
-corner.CornerRadius = UDim.new(0, 12)
+local stroke = Instance.new("UIStroke", flyFrame)
+stroke.Color = Color3.fromRGB(255, 0, 0)
+stroke.Thickness = 2
 
-local button = Instance.new("TextButton")
-button.Size = UDim2.new(1, 0, 1, 0)
-button.Text = "Fly: OFF"
-button.TextColor3 = Color3.new(1, 1, 1)
-button.BackgroundTransparency = 1
-button.Font = Enum.Font.GothamBold
-button.TextSize = 20
-button.Parent = frame
+local glow = Instance.new("UIGradient", flyFrame)
+glow.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 100, 100))
+}
+glow.Rotation = 90
 
--- Fly Functions
+local flyBtn = Instance.new("TextButton", flyFrame)
+flyBtn.Size = UDim2.new(1, -20, 0, 36)
+flyBtn.Position = UDim2.new(0, 10, 0, 8)
+flyBtn.Text = "Fly: OFF"
+flyBtn.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
+flyBtn.TextColor3 = Color3.new(1,1,1)
+flyBtn.Font = Enum.Font.GothamBold
+flyBtn.TextSize = 20
+flyBtn.ZIndex = 2
+Instance.new("UICorner", flyBtn).CornerRadius = UDim.new(0,8)
+
+-- Speed input
+local speedBox = Instance.new("TextBox", flyFrame)
+speedBox.Size = UDim2.new(0, 80, 0, 30)
+speedBox.Position = UDim2.new(0, 10, 0, 54)
+speedBox.PlaceholderText = "Speed"
+speedBox.Text = "1"
+speedBox.BackgroundColor3 = Color3.fromRGB(255,255,255)
+speedBox.TextColor3 = Color3.new(0,0,0)
+speedBox.Font = Enum.Font.Gotham
+speedBox.TextSize = 18
+speedBox.ClearTextOnFocus = false
+Instance.new("UICorner", speedBox).CornerRadius = UDim.new(0,6)
+
+local speedLabel = Instance.new("TextLabel", flyFrame)
+speedLabel.Size = UDim2.new(0, 280, 0, 30)
+speedLabel.Position = UDim2.new(0, 100, 0, 54)
+speedLabel.BackgroundTransparency = 1
+speedLabel.Text = "Speed (x100 studs/sec)"
+speedLabel.TextColor3 = Color3.new(1,1,1)
+speedLabel.Font = Enum.Font.GothamBold
+speedLabel.TextSize = 16
+speedLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Credits
+local creditLabel = Instance.new("TextLabel", flyFrame)
+creditLabel.Size = UDim2.new(1,0,0,20)
+creditLabel.Position = UDim2.new(0,0,0,88)
+creditLabel.Text = "Credits: Zack858"
+creditLabel.Font = Enum.Font.GothamBold
+creditLabel.TextSize = 14
+creditLabel.BackgroundTransparency = 1
+creditLabel.TextColor3 = Color3.new(1,1,1)
+creditLabel.ZIndex = 2
+local UIGradient = Instance.new("UIGradient", creditLabel)
+UIGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255,0,0)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(0,0,255))
+}
+
+-- Toggle Button (X)
+local toggleBtn = Instance.new("TextButton", screenGui)
+toggleBtn.Size = UDim2.new(0, 40, 0, 40)
+toggleBtn.Position = UDim2.new(1, -50, 0, 20)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+toggleBtn.Text = "X"
+toggleBtn.TextColor3 = Color3.new(1,1,1)
+toggleBtn.Font = Enum.Font.GothamBold
+toggleBtn.TextSize = 20
+toggleBtn.ZIndex = 3
+Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(1,0)
+toggleBtn.MouseButton1Click:Connect(function()
+    flyFrame.Visible = not flyFrame.Visible
+end)
+
+-- Speed input validation
+speedBox:GetPropertyChangedSignal("Text"):Connect(function()
+    local num = speedBox.Text:gsub("%D", "")
+    speedBox.Text = num
+    if tonumber(num) then
+        speedMultiplier = tonumber(num)
+        speed = 100 * speedMultiplier
+    end
+end)
+
+-- Fly logic
 local function startFly()
-	if flying then return end
-	flying = true
-	button.Text = "Fly: ON"
-
-	bv = Instance.new("BodyVelocity")
-	bv.MaxForce = Vector3.new(1e9, 1e9, 1e9)
-	bv.P = 1250
-	bv.Parent = hrp
-
-	bg = Instance.new("BodyGyro")
-	bg.MaxTorque = Vector3.new(1e9, 1e9, 1e9)
-	bg.P = 3000
-	bg.CFrame = hrp.CFrame
-	bg.Parent = hrp
-
-	coroutine.wrap(function()
-		while flying and bv and bg do
-			local cam = workspace.CurrentCamera
-			local move = Vector3.zero
-
-			-- Mobile Movement via virtual joystick
-			if UIS:IsKeyDown(Enum.KeyCode.W) then move += cam.CFrame.LookVector end
-			if UIS:IsKeyDown(Enum.KeyCode.S) then move -= cam.CFrame.LookVector end
-			if UIS:IsKeyDown(Enum.KeyCode.A) then move -= cam.CFrame.RightVector end
-			if UIS:IsKeyDown(Enum.KeyCode.D) then move += cam.CFrame.RightVector end
-			if UIS:IsKeyDown(Enum.KeyCode.Space) then move += cam.CFrame.UpVector end
-			if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then move -= cam.CFrame.UpVector end
-
-			bv.Velocity = move.Magnitude > 0 and move.Unit * speed or Vector3.zero
-			bg.CFrame = cam.CFrame
-
-			RunService.Heartbeat:Wait()
-		end
-	end)()
+    if flying then return end
+    flying = true
+    flyBtn.Text = "Fly: ON"
+    local colorTween = TweenService:Create(flyBtn, TweenInfo.new(0.4), {BackgroundColor3 = Color3.fromRGB(0, 200, 50)})
+    colorTween:Play()
+    bv = Instance.new("BodyVelocity", hrp)
+    bv.MaxForce = Vector3.new(1e9,1e9,1e9)
+    bv.P = 1250
+    bg = Instance.new("BodyGyro", hrp)
+    bg.MaxTorque = Vector3.new(1e9,1e9,1e9)
+    bg.P = 3000
+    coroutine.wrap(function()
+        while flying and bv and bg do
+            local cam = workspace.CurrentCamera
+            local dir = cam.CFrame.LookVector
+            bg.CFrame = CFrame.new(hrp.Position, hrp.Position + dir)
+            local move = Vector3.zero
+            if UIS:IsKeyDown(Enum.KeyCode.W) then move += cam.CFrame.LookVector end
+            if UIS:IsKeyDown(Enum.KeyCode.S) then move -= cam.CFrame.LookVector end
+            if UIS:IsKeyDown(Enum.KeyCode.A) then move -= cam.CFrame.RightVector end
+            if UIS:IsKeyDown(Enum.KeyCode.D) then move += cam.CFrame.RightVector end
+            if UIS:IsKeyDown(Enum.KeyCode.Space) then move += cam.CFrame.UpVector end
+            if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then move -= cam.CFrame.UpVector end
+            bv.Velocity = (move.Magnitude > 0 and move.Unit * speed or Vector3.zero)
+            RunService.Heartbeat:Wait()
+        end
+    end)()
 end
 
 local function stopFly()
-	flying = false
-	button.Text = "Fly: OFF"
-	if bv then bv:Destroy() end
-	if bg then bg:Destroy() end
+    flying = false
+    flyBtn.Text = "Fly: OFF"
+    local colorTween = TweenService:Create(flyBtn, TweenInfo.new(0.4), {BackgroundColor3 = Color3.fromRGB(0, 140, 255)})
+    colorTween:Play()
+    if bv then bv:Destroy() end
+    if bg then bg:Destroy() end
 end
 
--- Touch Button Handler
-button.MouseButton1Click:Connect(function()
-	if flying then
-		stopFly()
-	else
-		startFly()
-	end
+flyBtn.MouseButton1Click:Connect(function()
+    if flying then stopFly() else startFly() end
 end)
