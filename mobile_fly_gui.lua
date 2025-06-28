@@ -1,170 +1,127 @@
--- Mobile Fly GUI with Speed Input, Clean Design, and Toggle Button
 
-local UIS = game:GetService("UserInputService")
+-- Services
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
-local lp = Players.LocalPlayer
-local char = lp.Character or lp.CharacterAdded:Wait()
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
 
-local flying = false
-local speedMultiplier = 1
-local speed = 100
-local bv, bg
-
-local screenGui = Instance.new("ScreenGui", game.CoreGui)
-screenGui.Name = "FlyUI"
-screenGui.ResetOnSpawn = false
-
+local screenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+screenGui.Name = "FlyGUI"
 local flyFrame = Instance.new("Frame", screenGui)
-flyFrame.Size = UDim2.new(0, 210, 0, 110)
-flyFrame.Position = UDim2.new(1, -230, 1, -130)
+flyFrame.Size = UDim2.new(0, 210, 0, 130)
+flyFrame.Position = UDim2.new(1, -230, 1, -150)
 flyFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-flyFrame.Active = true
-flyFrame.Draggable = true
-flyFrame.ZIndex = 2
-Instance.new("UICorner", flyFrame).CornerRadius = UDim.new(0,12)
+flyFrame.BorderSizePixel = 0
 
-local stroke = Instance.new("UIStroke", flyFrame)
-stroke.Color = Color3.fromRGB(255, 0, 0)
-stroke.Thickness = 2
+local uiStroke = Instance.new("UIStroke", flyFrame)
+uiStroke.Color = Color3.fromRGB(255, 0, 0)
+uiStroke.Thickness = 2
 
-local glow = Instance.new("UIGradient", flyFrame)
-glow.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 100, 100))
-}
-glow.Rotation = 90
+local toggleBtn = Instance.new("TextButton", screenGui)
+toggleBtn.Size = UDim2.new(0, 40, 0, 40)
+toggleBtn.Position = UDim2.new(1, -50, 0, 20)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+toggleBtn.Text = ""
+toggleBtn.ZIndex = 3
+toggleBtn.Draggable = true
+
+local toggleIcon = Instance.new("ImageLabel", toggleBtn)
+toggleIcon.Size = UDim2.new(1, 0, 1, 0)
+toggleIcon.BackgroundTransparency = 1
+toggleIcon.Image = "rbxassetid://16758323333"
+
+toggleBtn.MouseButton1Click:Connect(function()
+    flyFrame.Visible = not flyFrame.Visible
+end)
 
 local flyBtn = Instance.new("TextButton", flyFrame)
 flyBtn.Size = UDim2.new(1, -20, 0, 36)
-flyBtn.Position = UDim2.new(0, 10, 0, 8)
-flyBtn.Text = "Fly: OFF"
+flyBtn.Position = UDim2.new(0, 10, 0, 10)
 flyBtn.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
-flyBtn.TextColor3 = Color3.new(1,1,1)
+flyBtn.Text = "Fly: OFF"
+flyBtn.TextColor3 = Color3.new(1, 1, 1)
 flyBtn.Font = Enum.Font.GothamBold
-flyBtn.TextSize = 20
-flyBtn.ZIndex = 2
-Instance.new("UICorner", flyBtn).CornerRadius = UDim.new(0,8)
+flyBtn.TextSize = 18
+Instance.new("UICorner", flyBtn).CornerRadius = UDim.new(0, 6)
 
--- Speed input
 local speedBox = Instance.new("TextBox", flyFrame)
-speedBox.Size = UDim2.new(0, 80, 0, 30)
+speedBox.Size = UDim2.new(0, 60, 0, 30)
 speedBox.Position = UDim2.new(0, 10, 0, 54)
-speedBox.PlaceholderText = "Speed"
-speedBox.Text = "1"
-speedBox.BackgroundColor3 = Color3.fromRGB(255,255,255)
-speedBox.TextColor3 = Color3.new(0,0,0)
-speedBox.Font = Enum.Font.Gotham
-speedBox.TextSize = 18
+speedBox.PlaceholderText = "1"
+speedBox.Text = ""
 speedBox.ClearTextOnFocus = false
-Instance.new("UICorner", speedBox).CornerRadius = UDim.new(0,6)
+speedBox.TextColor3 = Color3.new(0,0,0)
+speedBox.BackgroundColor3 = Color3.new(1,1,1)
+speedBox.TextScaled = true
 
 local speedLabel = Instance.new("TextLabel", flyFrame)
-speedLabel.Size = UDim2.new(0, 110, 0, 30)
-speedLabel.Position = UDim2.new(0, 100, 0, 54)
+speedLabel.Size = UDim2.new(0, 120, 0, 30)
+speedLabel.Position = UDim2.new(0, 80, 0, 54)
 speedLabel.BackgroundTransparency = 1
-speedLabel.Text = "Speed (x100 studs/sec)"
-speedLabel.TextColor3 = Color3.new(1,1,1)
-speedLabel.Font = Enum.Font.GothamBold
-speedLabel.TextSize = 16
+speedLabel.Text = "Speed (x100)"
+speedLabel.TextColor3 = Color3.new(1, 1, 1)
+speedLabel.Font = Enum.Font.Gotham
+speedLabel.TextSize = 14
 speedLabel.TextXAlignment = Enum.TextXAlignment.Left
 
--- Credits
-local creditLabel = Instance.new("TextLabel", flyFrame)
-creditLabel.Size = UDim2.new(1,0,0,20)
-creditLabel.Position = UDim2.new(0,0,0,88)
-creditLabel.Text = "Credits: Zack858"
-creditLabel.Font = Enum.Font.GothamBold
-creditLabel.TextSize = 14
-creditLabel.BackgroundTransparency = 1
-creditLabel.TextColor3 = Color3.new(1,1,1)
-creditLabel.ZIndex = 2
-local UIGradient = Instance.new("UIGradient", creditLabel)
-UIGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255,0,0)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(0,0,255))
-}
+local credits = Instance.new("TextLabel", flyFrame)
+credits.Size = UDim2.new(1, 0, 0, 20)
+credits.Position = UDim2.new(0, 0, 1, -22)
+credits.BackgroundTransparency = 1
+credits.Text = "Credits: Zack858"
+credits.TextColor3 = Color3.fromRGB(255, 60, 255)
+credits.Font = Enum.Font.GothamSemibold
+credits.TextSize = 13
 
--- Toggle Button (Among Us Image)
-local toggleBtn = Instance.new("ImageButton", screenGui)
-toggleBtn.Size = UDim2.new(0, 40, 0, 40)
-toggleBtn.Position = UDim2.new(1, -50, 0, 20)
-toggleBtn.BackgroundTransparency = 1
-toggleBtn.Image = "https://icon-icons.com/downloadimage.php?id=153088&root=153070/PNG/512/&file=among_us_red_icon_153088.png"
-toggleBtn.ZIndex = 3
-toggleBtn.Draggable = true
-toggleBtn.MouseButton1Click:Connect(function()
-    if flyFrame.Visible then
-        flyFrame.Visible = false
-    else
-        flyFrame.Visible = true
-        flyFrame.Position = UDim2.new(1, -230, 1, -130)
-        flyFrame.BackgroundTransparency = 1
-        flyFrame:TweenPosition(UDim2.new(1, -230, 1, -130), "Out", "Quad", 0.4, true)
-        flyFrame:TweenSize(UDim2.new(0, 210, 0, 110), "Out", "Quad", 0.4, true)
-        game:GetService("TweenService"):Create(flyFrame, TweenInfo.new(0.4), {BackgroundTransparency = 0}):Play()
-    end
-end)
+local flying = false
+local bv, bg
 
+local function toggleFly()
+    flying = not flying
+    flyBtn.Text = "Fly: " .. (flying and "ON" or "OFF")
+    local speedVal = tonumber(speedBox.Text) or 1
+    local speed = math.clamp(speedVal, 0.1, 10) * 100
 
--- Speed input validation
-speedBox:GetPropertyChangedSignal("Text"):Connect(function()
-    local num = speedBox.Text:gsub("%D", "")
-    speedBox.Text = num
-    if tonumber(num) then
-        speedMultiplier = tonumber(num)
-        speed = 100 * speedMultiplier
-    end
-end)
+    if flying then
+        bv = Instance.new("BodyVelocity", hrp)
+        bv.Velocity = Vector3.zero
+        bv.MaxForce = Vector3.new(1, 1, 1) * 1e5
 
--- Fly logic
-local function startFly()
-    if flying then return end
-    flying = true
-    flyBtn.Text = "Fly: ON"
-    local colorTween = TweenService:Create(flyBtn, TweenInfo.new(0.4), {BackgroundColor3 = Color3.fromRGB(0, 200, 50)})
-    colorTween:Play()
-    bv = Instance.new("BodyVelocity", hrp)
-    bv.MaxForce = Vector3.new(1e9,1e9,1e9)
-    bv.P = 1250
-    bg = Instance.new("BodyGyro", hrp)
-    bg.MaxTorque = Vector3.new(1e9,1e9,1e9)
-    bg.P = 3000
-    coroutine.wrap(function()
-        while flying and bv and bg do
-            local cam = workspace.CurrentCamera
-            local move = Vector3.zero
-            if UIS:IsKeyDown(Enum.KeyCode.W) then move += cam.CFrame.LookVector end
-            if UIS:IsKeyDown(Enum.KeyCode.S) then move -= cam.CFrame.LookVector end
-            if UIS:IsKeyDown(Enum.KeyCode.A) then move -= cam.CFrame.RightVector end
-            if UIS:IsKeyDown(Enum.KeyCode.D) then move += cam.CFrame.RightVector end
-            if UIS:IsKeyDown(Enum.KeyCode.Space) then move += cam.CFrame.UpVector end
-            if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then move -= cam.CFrame.UpVector end
+        bg = Instance.new("BodyGyro", hrp)
+        bg.MaxTorque = Vector3.new(1, 1, 1) * 1e5
+        bg.P = 10000
+        bg.CFrame = hrp.CFrame
 
-            if move.Magnitude > 0 then
-                move = move.Unit * speed
-                bv.Velocity = move
-                bg.CFrame = CFrame.new(hrp.Position, hrp.Position + move)
-            else
-                bv.Velocity = Vector3.zero
+        coroutine.wrap(function()
+            while flying and bv and bg do
+                local cam = workspace.CurrentCamera
+                local move = Vector3.zero
+                if UIS:IsKeyDown(Enum.KeyCode.W) then move += cam.CFrame.LookVector end
+                if UIS:IsKeyDown(Enum.KeyCode.S) then move -= cam.CFrame.LookVector end
+                if UIS:IsKeyDown(Enum.KeyCode.A) then move -= cam.CFrame.RightVector end
+                if UIS:IsKeyDown(Enum.KeyCode.D) then move += cam.CFrame.RightVector end
+                if UIS:IsKeyDown(Enum.KeyCode.Space) then move += cam.CFrame.UpVector end
+                if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then move -= cam.CFrame.UpVector end
+
+                if move.Magnitude > 0 then
+                    move = move.Unit * speed
+                    bv.Velocity = move
+                    bg.CFrame = CFrame.new(hrp.Position, hrp.Position + move)
+                else
+                    bv.Velocity = Vector3.zero
+                end
+
+                RunService.Heartbeat:Wait()
             end
-
-            RunService.Heartbeat:Wait()
-        end
-    end)()
+        end)()
+    else
+        if bv then bv:Destroy() end
+        if bg then bg:Destroy() end
+    end
 end
 
-local function stopFly()
-    flying = false
-    flyBtn.Text = "Fly: OFF"
-    local colorTween = TweenService:Create(flyBtn, TweenInfo.new(0.4), {BackgroundColor3 = Color3.fromRGB(0, 140, 255)})
-    colorTween:Play()
-    if bv then bv:Destroy() end
-    if bg then bg:Destroy() end
-end
-
-flyBtn.MouseButton1Click:Connect(function()
-    if flying then stopFly() else startFly() end
-end)
+flyBtn.MouseButton1Click:Connect(toggleFly)
