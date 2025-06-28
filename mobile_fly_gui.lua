@@ -1,157 +1,17 @@
--- Mobile Fly GUI with Speed Input, Clean Design, and Toggle Button
+--[[
+          ...                               .---:                                                                                             
+         .%%%-                             *%%%#*                                                 :===                                        
+         .%%%-    .::.  ... ...      ... .=%%%:.. ...     ..     .:.        .:..       .:.  ...  .=%%#..     ..:.      ...  .:                
+         .%%%-  =#%%%%%*%%% -%%#    -%%#.*%%%%%%*.%%%.   *%%+ .*%%%%%+   -*%%%%%#=  :*%%%%%*%%%-.%%%%%%%: .+#%%%%%*-  :%%%:#%%:               
+         .%%%- *%%#-::=#%%%  =%%*  .#%%: .=%%#....%%%.   *%%+ =%%#      *%%*-::=*=.:%%%=::-*%%%- .=%%#.. :%%%=::-#%%+ :%%%#+--                
+         .%%%-.%%%:    :%%%   *%%= *%%-   -%%#   .%%%.   *%%+  +#%%#*- .%%%.       +%%+     #%%-  -%%#   *%%=    .%%%.:%%%:                   
+    :=: .=%%%. #%%+   .*%%%    #%%*%%=    -%%#   .%%%-  .#%%+      *%%+ #%%=   :-. =%%#:   -%%%-  -%%#   =%%#.   +%%# :%%%                    
+   -%%%%%%%%-  .*%%%##%%%%%    .#%%%+     -%%#    +%%%##%#%%+ =%%#*#%%- .*%%%#%%%*. =%%%##%%%%%-  .#%%%#: =#%%%#%%%+. :%%%                    
+     :====:      .-===:.---     =%%*      .---     .-==-.:--:  .-===-      -===-.     :===- ---.    -==-    :-===:    .---                    
+                               :%%#.                                                                                                          
+                               ===.                                                                                                           
+--]]
 
-local UIS = game:GetService("UserInputService")
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local TweenService = game:GetService("TweenService")
-local lp = Players.LocalPlayer
-local char = lp.Character or lp.CharacterAdded:Wait()
-local hrp = char:WaitForChild("HumanoidRootPart")
+-- Jayfuscator V1.2.1 --
 
-local flying = false
-local speedMultiplier = 1
-local speed = 100
-local bv, bg
-
-local screenGui = Instance.new("ScreenGui", game.CoreGui)
-screenGui.Name = "FlyUI"
-screenGui.ResetOnSpawn = false
-
-local flyFrame = Instance.new("Frame", screenGui)
-flyFrame.Size = UDim2.new(0, 420, 0, 110)
-flyFrame.Position = UDim2.new(1, -440, 1, -130)
-flyFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-flyFrame.Active = true
-flyFrame.Draggable = true
-flyFrame.ZIndex = 2
-Instance.new("UICorner", flyFrame).CornerRadius = UDim.new(0,12)
-
-local stroke = Instance.new("UIStroke", flyFrame)
-stroke.Color = Color3.fromRGB(255, 0, 0)
-stroke.Thickness = 2
-
-local glow = Instance.new("UIGradient", flyFrame)
-glow.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 100, 100))
-}
-glow.Rotation = 90
-
-local flyBtn = Instance.new("TextButton", flyFrame)
-flyBtn.Size = UDim2.new(1, -20, 0, 36)
-flyBtn.Position = UDim2.new(0, 10, 0, 8)
-flyBtn.Text = "Fly: OFF"
-flyBtn.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
-flyBtn.TextColor3 = Color3.new(1,1,1)
-flyBtn.Font = Enum.Font.GothamBold
-flyBtn.TextSize = 20
-flyBtn.ZIndex = 2
-Instance.new("UICorner", flyBtn).CornerRadius = UDim.new(0,8)
-
--- Speed input
-local speedBox = Instance.new("TextBox", flyFrame)
-speedBox.Size = UDim2.new(0, 80, 0, 30)
-speedBox.Position = UDim2.new(0, 10, 0, 54)
-speedBox.PlaceholderText = "Speed"
-speedBox.Text = "1"
-speedBox.BackgroundColor3 = Color3.fromRGB(255,255,255)
-speedBox.TextColor3 = Color3.new(0,0,0)
-speedBox.Font = Enum.Font.Gotham
-speedBox.TextSize = 18
-speedBox.ClearTextOnFocus = false
-Instance.new("UICorner", speedBox).CornerRadius = UDim.new(0,6)
-
-local speedLabel = Instance.new("TextLabel", flyFrame)
-speedLabel.Size = UDim2.new(0, 280, 0, 30)
-speedLabel.Position = UDim2.new(0, 100, 0, 54)
-speedLabel.BackgroundTransparency = 1
-speedLabel.Text = "Speed (x100 studs/sec)"
-speedLabel.TextColor3 = Color3.new(1,1,1)
-speedLabel.Font = Enum.Font.GothamBold
-speedLabel.TextSize = 16
-speedLabel.TextXAlignment = Enum.TextXAlignment.Left
-
--- Credits
-local creditLabel = Instance.new("TextLabel", flyFrame)
-creditLabel.Size = UDim2.new(1,0,0,20)
-creditLabel.Position = UDim2.new(0,0,0,88)
-creditLabel.Text = "Credits: Zack858"
-creditLabel.Font = Enum.Font.GothamBold
-creditLabel.TextSize = 14
-creditLabel.BackgroundTransparency = 1
-creditLabel.TextColor3 = Color3.new(1,1,1)
-creditLabel.ZIndex = 2
-local UIGradient = Instance.new("UIGradient", creditLabel)
-UIGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255,0,0)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(0,0,255))
-}
-
--- Toggle Button (X)
-local toggleBtn = Instance.new("TextButton", screenGui)
-toggleBtn.Size = UDim2.new(0, 40, 0, 40)
-toggleBtn.Position = UDim2.new(1, -50, 0, 20)
-toggleBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-toggleBtn.Text = "X"
-toggleBtn.TextColor3 = Color3.new(1,1,1)
-toggleBtn.Font = Enum.Font.GothamBold
-toggleBtn.TextSize = 20
-toggleBtn.ZIndex = 3
-Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(1,0)
-toggleBtn.MouseButton1Click:Connect(function()
-    flyFrame.Visible = not flyFrame.Visible
-end)
-
--- Speed input validation
-speedBox:GetPropertyChangedSignal("Text"):Connect(function()
-    local num = speedBox.Text:gsub("%D", "")
-    speedBox.Text = num
-    if tonumber(num) then
-        speedMultiplier = tonumber(num)
-        speed = 100 * speedMultiplier
-    end
-end)
-
--- Fly logic
-local function startFly()
-    if flying then return end
-    flying = true
-    flyBtn.Text = "Fly: ON"
-    local colorTween = TweenService:Create(flyBtn, TweenInfo.new(0.4), {BackgroundColor3 = Color3.fromRGB(0, 200, 50)})
-    colorTween:Play()
-    bv = Instance.new("BodyVelocity", hrp)
-    bv.MaxForce = Vector3.new(1e9,1e9,1e9)
-    bv.P = 1250
-    bg = Instance.new("BodyGyro", hrp)
-    bg.MaxTorque = Vector3.new(1e9,1e9,1e9)
-    bg.P = 3000
-    coroutine.wrap(function()
-        while flying and bv and bg do
-            local cam = workspace.CurrentCamera
-            local dir = cam.CFrame.LookVector
-            bg.CFrame = CFrame.new(hrp.Position, hrp.Position + dir)
-            local move = Vector3.zero
-            if UIS:IsKeyDown(Enum.KeyCode.W) then move += cam.CFrame.LookVector end
-            if UIS:IsKeyDown(Enum.KeyCode.S) then move -= cam.CFrame.LookVector end
-            if UIS:IsKeyDown(Enum.KeyCode.A) then move -= cam.CFrame.RightVector end
-            if UIS:IsKeyDown(Enum.KeyCode.D) then move += cam.CFrame.RightVector end
-            if UIS:IsKeyDown(Enum.KeyCode.Space) then move += cam.CFrame.UpVector end
-            if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then move -= cam.CFrame.UpVector end
-            bv.Velocity = (move.Magnitude > 0 and move.Unit * speed or Vector3.zero)
-            RunService.Heartbeat:Wait()
-        end
-    end)()
-end
-
-local function stopFly()
-    flying = false
-    flyBtn.Text = "Fly: OFF"
-    local colorTween = TweenService:Create(flyBtn, TweenInfo.new(0.4), {BackgroundColor3 = Color3.fromRGB(0, 140, 255)})
-    colorTween:Play()
-    if bv then bv:Destroy() end
-    if bg then bg:Destroy() end
-end
-
-flyBtn.MouseButton1Click:Connect(function()
-    if flying then stopFly() else startFly() end
-end)
+return(function(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z)local z,ba,bb,bc,bd,be,bf,bg,bh,bi,bj,bk,bl,bm,bn,bo,bp,bq,br,bs,bt,bu,bv,bw,bx,by,bz,ca,cb,cc,cd,ce,cf,cg,ch,ci,cj,ck,cl,cm,cn=94,86,94,10,66,12,52,99,97,57,42,63,93,83,45,47,45,95,44,34,74,90,35,81,39,45,93,41,55,36,24,73,30,95,98,10,83,52,35,97,62,83,70,49,15,69,10,34,71,10,87,52 while z~=71 do if ba<=753 then if ba>=430 then if ba<=562 then if ba>=487 then if ba<=487 then do bb=(function(co,cp)do if'number'==ck(co)then return true else return false end end end)end ba=536 else if ba<557 then ba=562 bz=math.abs else ba=604 bi=math.floor end end else if ba>436 then ba=487 do ck=type end else ba=458 bs=select end end else if ba>=697 then if ba<=697 then ba=715 for co=0,255 do be[co]=bg(co);end else if ba<750 then do bp=bc('09000000000D082005230800000000280810001C08000000003C7800011D780000000051307005233000000000780810001C08000000008568E0012368000000008D7800002778000000008D8800002788000000008C0810001C080000000F0000000200000000092800002728000000000D280000272800000003000000000000000000000000050000000000B20050000B1000000000000000001110000000000100000027080000000000000000021000000000040000001F1800000100000003040000005F454E56010000000014004000040000000000000000022D0000000000AE0080040B6800000000100030001700000000000B0040002AB8000000002A01E0010B4800000000B600D0040B580000000000002002310800000000720050020B38000000000B0000002A0800000000420020050B2801000000260120010B80000000000C000000021000000000030010000128000000003600F0010B60010000000900B0012308000000000D000002231000000000820090010BD0000000007C60600726800000000000003000132800000000080030000E10000000009E0020060B380000000000000000111800000000080030000E1000000000DE0060020BD0000000000C0020001D1800000000AE0050000B8000000000F200F0040BF8000000000B0000002AE0000000007E01C0010B20000000000B0010002A30010000005A01C0030BF0000000007A00E0030B580000000018004000040000000000000030001330000000001800500004080000000004003000133000000000DA0000030BA800000000040000001F08000000001601F0010B50000000001000300017000000000014003000170800000000130050000750010000003601D0020BC8000000000C0020001D1800000000EA0080000BF800000000A20060040B3800000300000004000000000000F03F040000000000000000040000000000000040000000000000000002060000000000FA0000040B08000000000800000003000000000008001000101000000000000010000C100000000000000000111800000000040000001F1000000100000004000000000000F03F015F0000000000560010060BC0020000004100500423900000000045009005239800000000480000000300000000003E01C0030B8800000000590010002398000000005C0040010500000000005C00000003B8000000006100C0002398000000005A00F0FF20B002000000B20060050B58000000006800F00031A8000000006C00800331180000000070005004316000000000740040013110000000006A00C0010B3802000000040000001F10000000004D00D0052398000000004600F0FF20E001000000BA0070030BB001000000580040010500000000003C0060010CA0000000002601E0050BE0010000001800A0002D30000000001D0000002720000000001C00B0002D3800000000210000002760000000005201A0050BE0000000007400100116A800000000250000002770000000002700000021A0020000004A0010030B10010000003C0050011810000000003C000000021000000000320130010B68010000007000000000F0000000006C0020000600000000005400B00130D0000000008601A0030BB00200000039514007263801000000080060002D1000000000A55A50072648010000000C0070002D1800000000110000002728000000002A0100030B1002000000290000002778000000002D0000002780000000003100000012080000000035000000121000000000390020032388000000003C0000000A0000000000520030010B08000000003C0050010CA000000000560020000BE0010000005500600123A000000000590000002718000000005C004001050000000000580020002910000000009000500015B000000000DE0060020B90020000004600F0FF1EB001000000160160020B0001000000460160030B680200000000000000021000000000000000001120000000000E0080030B2800000000100080002D200000000015000000272800000000140090002D2800000000190000002720000000004601B0000BB800000000780040010500000000007C00000431C8000000008000100531C8000000007400200028000100000078004003317000000000220170050B1801000000090000002718000000000C00F005310000000000080020002910000000000B00400025E002000000460030060BF0020000009300100022A0000000003601C0010B0802000000250000001200000000004E0120010B68010000005A00F0FF1E58000000006E0010030BA0010000000500F003230800000000080020002D00000000000B00100022F801000000320120060BF0010000000800A0011B4801000000080000000210000000009600B0050B3801001500000003180000004A46535F505249564154455F584F525F46554E4354494F4E04000000000000F0BF03040000007479706503050000007461626C650306000000737472696E6703040000006279746503040000006368617203030000007375620304000000677375620306000000636F6E6361740306000000696E7365727403040000006D61746803050000006C64657870030700000067657466656E76030C0000007365746D6574617461626C65030600000073656C656374040000000000002E4004000000000000000004000000000000F03F03000000000001000000000000000000040000000000760000020B10000000000000000011080000000000000000021000000000040000001F200000000000000000000000000000000E00000000004E0120010B280000000000002000100000000000460050030B58000000000600F0FF2058000000008E0120000B08000000000100C005230800000000050000022310000000000900D0022318000000000D0010002310000000004A0090040B1800000000000000001108000000000600F0FF1E0800000000960010010B5000000000040000001F1800000300000004000000000000000004000000000000F03F040000000000001440000000000000000000050000000000260040020B1000000000000000001120000000000100D00323080000000000000000021000000000040000001F080000010000000400000000000000000000000000000000000500000000000A0040000B1000000000000000001120000000000100200523080000000000000000021000000000040000001F1800000100000004000000000000F03F000000000000000000050000000000C20030020B180000000000000000111000000000040000001F20000000000100100623080000000000000000021000000100000004000000000000004001000000000108000323080000000000000000050000000000320060050B100000000000000000110800000000A969E00326100000000000000000021000000000040000001F20000001000000040000000000000840000000000000000000050000000000E600C0030B08000000000100C0002308000000000400000008080000000000000000112000000000040000001F20000001000000040000000000001040000000000000000000030000000000F20030000B080000000000000000111000000000040000001F08000000000000000000000000000000030000000000260130010B1000000000040000001F1800000000000000001120000000000000000000000000000000030000000000D200C0050B080000000000000000112000000000040000001F080000000000000000000000000000000300000000000E00D0020B080000000000000000112000000000040000001F080000000000000000000000000000000400000000002A0170010B1000000000040000001F20000000000100700523080000000000000000110800000100000004000000000000F03F000000000000000000040000000000220120000B1000000000040000001F08000000000100B003230800000000000000001120000001000000040000000000000040000000000000000000040000000000E20060000B08000000000100700523080000000000000000111800000000040000001F18000001000000040000000000000840009800000000000E0000010BB002000000040000001F10000000001A00F0FF206003000000720110060B3004000000150000001210000000001900B0042318000000001D009002232800000000210080022318000000000A0130020B1000000000440020002E08000000004000100104800000000044008003316800000000440020002E0800000000C600A0000BD8000000007908F0092670000000001100A00023080000000015000000120800000000150000002C10000000001500E002231800000000EE00C0020B70010000005D0000001240000000006100000012480000000065000000125000000000690000001258000000006C00100631B800000000D200B0050B0804000000FA0080040B200300000048007003315000000000480020002E08000000004400200124880000000048000004317000000000480020002E0800000000560140020B88040000004D004005233000000000092310082610010000005500F00123300000000059008001233000000000A60020050B6001000000920080000BE80300000078002000312800000000780010001C0800000000780000053128000000004429D00A265001000000420160050B70030000004F00400119E803000000620030050B3001000000190020012320000000001D0030052318000000001600F0FF20B004000000AA0060010B18020000001C18000426900100000040005005316000000000400020002E080000000044005000315800000000120120000B48000000007D003004235800000000810050012360000000007532B00B26C801000000860110030B38020000003C0050053150000000003C0020002E080000000040005000315800000000400020002E08000000001E0120010B90010000009C0060022430010000009C006002043801000000AA00D0030BF80300000025000000271000000000240020002E0800000000040090000C4000000000A200B0050BB004000000890000042370000000008D0000032318000000009100D005232000000000950090002318000000008E0130040BA0020000006E00C0010BA000000000240000000A0000000000290000001218000000002D000000122000000000310000001228000000003500000012300000000039000000123800000000E20000030BD8010000008E00F0FF20F803000000CA0060020B000200000001000000120000000000040000000A00000000000800A0041B58010000003E00C0020B70000000006D0050042340000000007100200223480000000075000001235000000000EA0070020B38010000008D0000001270000000008D0000002C8800000000E13850082600030000008C0010001C08000000008D000000278000000000EA00A0030B90030000004300F00001A0000000001A0140000B60020000005C0010000EB000000000320020060BB0030000005100A0032320000000005500D0042318000000004E00F0FF20B003000000120060020B30030000001A00F0FF1E3004000000360160010B680400000078002000312800000000780010001C0800000000790010012318000000005A0020020BB8010000008C0010001C080000000009410001269803000000804AE00426A003000000000000001110000000004E00F0FF1E3003000000DE0000050B08010000008D0000001260000000008D0000002C78000000008D0000001268000000008D0000002C8000000000660090030BF0020000000B0070000F2003000000860000050BD0000000008E00F0FF1E00020000001201D0040BC0030000006C0010001C08000000006C00200231C0000000006C0010001C08000000006C00700231C8000000009600D0020B48040000002800A003312800000000D81170082638040000001A0030000B60030000006C0010001C08000000006C00E00431D0000000006C0010001C0800000000260140030BD002000000180000000A00000000001C0000000A0000000000200000000A00000000004201C0040B68020000004C00E0043158000000004C0020002E0800000000480030010990000000004D003003231800000000820010020B40030000001600F0FF1E18020000007600A0010B200000110000000400000000000000000309000000646F4E6F7468696E6704000000000000F03F0400000000000024400400000000000034400300000000010304000000626C75650305000000677265656E030600000079656C6C6F7704000000000000004004000000000000084003030000006261720303000000717578030E000000656D70747946756E6374696F6E41030E000000656D70747946756E6374696F6E42030E000000656D70747946756E6374696F6E43','..',function(co,cp,cp)return be[cc(co,16)]end)end ba=753 else do bk={{0,1,2,3,4,5,6,7,8,9,10,11,12,13,s,m,},{1,0,3,2,5,4,7,6,9,8,11,10,13,12,15,i,},{2,3,0,1,6,f,4,5,10,11,8,9,14,15,12,o,},{3,2,1,0,7,6,5,4,11,10,9,8,15,14,13,12,},{b,5,6,7,0,1,2,3,12,13,14,15,8,9,10,11,},{5,4,7,6,1,0,3,2,13,12,15,14,9,8,11,10,},{6,7,4,5,2,3,0,1,14,15,12,13,10,11,8,9,},{7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8,},{8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,},{9,8,11,10,13,12,15,14,q,0,3,2,5,4,7,6,},{10,11,8,9,14,15,12,13,2,3,0,1,6,7,4,5,},{11,10,9,8,15,14,13,12,3,2,1,0,7,6,5,4,},{12,13,14,15,8,9,10,11,4,g,6,c,0,1,2,3,},{13,12,15,14,9,8,11,10,5,4,7,p,1,0,3,2,},{14,15,a,13,10,11,8,9,6,7,4,5,2,3,0,1,},{15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,},nil,nil}end ba=782 end end else if ba<=604 then ba=640 bd=(unpack or table.unpack)else if ba>648 then ba=697 be={}else ba=668 do cc=tonumber end end end end end else if ba>=243 then if ba<=311 then if ba<=243 then ba=280 cm=string.rep else if ba<304 then by=table.concat ba=311 else ba=353 do bf=table.insert end end end else if ba>=379 then if ba<392 then cf=(getfenv or function()return _ENV end)ba=400 else ba=430 ca=setmetatable end else ba=379 bh=math.ldexp end end else if ba<=108 then if ba>92 then do br=string.byte end ba=127 else bb,bc,bd,be,bf,bg,bh,bi,bj,bk,bl,bm,bn,bo,bp,bq,br,bs,bt,bu,bv,bw,bx,by,bz,ca,cb,cc,cd,ce,cf,cg,ch,ci,cj,ck,cl,cm,cn=nil ba=108 end else if ba>=171 then if ba>178 then ba=243 bc=string.gsub else ba=209 do bt=string.sub end end else do bg=string.char end ba=171 end end end end else if ba>=1102 then if ba>=1276 then if ba<=1314 then if ba<=1276 then ba=1293 cg=function(a,b,b,b,b)local b,c,f,g,i,m,o,p=57,70,54,29,72,66,42,44,46,59,21,69,82,21,54,76,43,90,24,91,42,83,24,58 while b~=43 do if c>=339 then if c>=454 then if c>=525 then if c>=543 then if c>550 then b=43;else c=582 do return f;end end else f[122]=i c=543 end else if c>456 then for b=1,m do local q,s,bb,bc=74,33,87,90,79,22,33,25,78,49,90,58 while q~=29 do if s>=106 then if s<=106 then s=123 if(0==bc)then bb=(0~=cj());elseif(not(bc~=4))then bb=ch();elseif(3==bc)then bb=bo();elseif(2==bc)then bb=a[bo()];end;else if s<161 then s=170 i[b]=bb;else q=29;end end else if s<=33 then s=52 bb,bc=nil else if s<85 then bc=cj()s=87 else bb=nil s=106 end end end end end c=525 else c=484 i={}end end else if c>=384 then if c>392 then do m=cl()end c=454 else f[75]=g;c=430 end else if c<348 then c=357 f[156]=cj();else do for a=1,cl()do local b,q,s,bb,bc,be=68,45,91,80,88,91,34,29,25,23,72,51,92,69,69,39,73,65,15,88,18,92,22,56 while b~=46 do if q>=348 then if q>=476 then if q>=552 then if q>=588 then if q>592 then b=46;else q=606 g[a]=bc;end else q=588 bc[54]=-bc[95]end else if q>481 then q=552 bc[53]=-bc[142]else do bc[160]=cb(s,12,20);end q=509 end end else if q>=409 then if q>414 then q=476 bc[95]=cb(s,21,29);else q=429 bc[14]=cb(be,12,r);end else if q>356 then do bc[142]=cb(s,3,11);end q=409 else q=376 bc[119]=cb(be,1,11);end end end else if q<=129 then if q<=73 then if q<68 then q=73 s,bb,bc,be=nil else q=108 do bc={{},nil,nil,nil}end end else if q>117 then q=172 do bc[116]={};end else q=129 bc[112]=cj();end end else if q<=212 then if q<207 then if d==cj()then for a=1,cj()do bc[u][a]={cj()==0,cl()}end end q=212 else q=261 s=cl()end else if q>=293 then if q<310 then bb=cb(s,1,2)q=313 else bc[80]=bb q=348 end else be=cl()q=293 end end end end end end end c=384 end end end else if c>=208 then if c<=251 then if c<243 then p=cl()c=251 else c=282 for a=(#bl+1),(#bl+p)do local b,d,q,r,s=84,53,95,82,49,72,12,86,74,15,52,46,75,21,33,32,29,46,13,45,39,70 while b~=42 do if d>=315 then if d<=429 then if d<=363 then if d>317 then do q[82]=cb(r,12,e);end d=390 else d=363 q[142]=cb(r,3,11);end else if d<422 then d=429 q[95]=cb(r,21,29);else d=474 do q[14]=cb(s,12,33);end end end else if d<=491 then if d<485 then d=491 q[53]=-q[142]else d=508 q[54]=-q[95]end else if d>513 then break else d=526 do bl[a]=q;end end end end else if d<=151 then if d>=115 then if d<145 then d=151 q[112]=cj();else do r=cl()end d=185 end else if d>56 then q={}d=115 else q,r,s=nil d=97 end end else if d>=246 then if d>252 then d=315 q[t]=cb(s,1,11);else q[80]=cb(r,1,2);d=282 end else if d<214 then s=cl()d=219 else d=246 q[160]=cj();end end end end end end end else if c>287 then f[121]=o;c=339 else c=316 do for a=1,cl()do o[a-1]=cg();end end end end else if c<=110 then if c>79 then c=148 g={}else c=110 f,g,i,m,o,p=nil end else if c<167 then c=170 o={}else f={}c=208 end end end end end end else if ba>1298 then ba=1338 do cn={}end else ce={}ba=1314 end end else if ba>=1360 then if ba<1397 then ba=1399 do return bj(cg(cf()),{},cf())();end else z=71;end else ba=1360 bj=function(a,b,b,c,c)local c,d,e,f,g c=ce do d=a[156]end do f=a[w]end do e=a[75]end do g=a[121]end return function(...)local a,c,i,m,o,p,q,r,s p=1 a=-1 s=-1 c={}do r={...}end m=(bs('#',...)-1)do i={}end do q={}end for s=0,m do do if(not(s<d))then do c[(s-d)]=r[(s+1)];end else do q[s]=r[(s+1)];end end;end end;o=(m-d+1)while true do local c,d,m,o,r,s,t,u,w,z do u=e[p]end w=u[119]do o=u[112]end d=u[142]m=u[82]t=u[95]r=u[160]do c=u[53]end z=u[14]s=u[54]if not(w>k)then if not(w>11)then if not(w>5)then if not(w<3)then if not(w>3)then q[d]=#q[u[14]];else if not(w~=4)then q[d]=(q[z]-q[u[95]]);else q[d]=q[u[14]][q[u[95]]];end end else if not(w<1)then if not(w~=1)then if((q[d]<q[u[95]]))then p=z;end;else do do return q[d]end end end else local c,k,m,o m=d c,k=cd(q[m](bd(q,(m+1),z)))a=(k+m-1)do o=0 end for k=m,a do o=(o+1);q[k]=c[o];end;end end else do if not(w>8)then if not(w<7)then if(w>7)then e[p]={[119]=w-6,[v]=0,[14]=2,[95]=0,[160]=0};do p=(p-1);end elseif(q[t]~=q[d])then p=z;end else local c c=d do q[c]=q[c](bd(q,c+1,a));end end else if not(w>9)then do q[d]=(q[z]/q[u[95]]);end else if(w>10)then p=z;else do q[d]={};end end end end end end else if not(w<18)then if not(w<21)then if not(w>22)then if(u[119]>21)then e[p]={[119]=u[119]- -23,[142]=8,[160]=y,[14]=8,[95]=13};p=(p-1);else do q[d]=f[u[95]]~=q[u[14]];end end else do if not(w~=23)then do q[u[142]]=(q[z]%f[t]);end else q[d][f[z]]=f[t];end end end else if not(u[119]<19)then if not(w~=19)then do q[d]=(q[u[14]]/f[t]);end else p=((q[d]<q[t])and u[14]or p)end else q[d]=bj(g[z],nil,b);end end else if not(w>14)then if not(w>12)then q[d][q[z]]=q[t];else if not(w~=13)then p=((q[d]~=q[t])and z or p)else do q[u[142]]=(q[u[14]]*f[t]);end end end else if not(u[119]>15)then if(f[u[95]]==q[d])then p=z;end;else do if 16==w then q[d]=(q[u[14]]+f[u[x]]);else local c c={}do while#i>0 do for k=1,#i do local k=i[k]for m=0,#k do local k=k[m]local m=k[1]local o=k[2]if m==q and o>=0 then c[o]=m[o]k[1]=c end end end break end end do return w,0;end end end end end end end else if not(w>37)then if not(w>30)then if not(w<28)then if not(w<29)then if(w>29)then local c,k,m k=u[142]do m=q[(k+2)]end c=(q[k]+m)do q[k]=c;end if((m>0))then while(c<=q[k+1])do p=z;q[k+3]=c;break end elseif(not(c<q[k+1]))then p=z;q[(k+3)]=c;end else do q[d]=(q[z]+q[t]);end end else q[d]();end else if not(u[119]>25)then do if(q[t]==q[d])then p=z;end;end else do if(w>26)then q[d]=nil;else f=ce[d](f)end end end end else if not(w<34)then if not(w<36)then if 36==w then q[d]=(q[z]*q[t]);else if(not(q[d]==f[t]))then do p=z;end end;end else do if(u[119]<35)then if q[u[142]]then p=z;end;else q[d]=f[z]end end end else if not(w<32)then if 32==w then local c,k,m m=d k=q[m]c=q[(m+2)]do if((c>0))then if((k>q[m+1]))then do p=u[14];end else q[(m+3)]=k;end elseif((k<q[m+1]))then p=z;else do q[(m+3)]=k;end end end else do if not q[d]then p=z;end;end end else local c,k k=d c={}while#i>0 do for m=1,#i do local i=i[m]for m=j,#i do local i=i[m]local j=i[1]local m=i[2]if j==q and m>=0 then c[m]=j[m]i[1]=c end end end break end do return bd(q,k,a);end end end end else if not(w>43)then if not(w<41)then do if not(w<42)then if(w<43)then if((f[d]<q[t]))then do p=z;end end;else do p=((f[d]~=f[t])and z or p)end end else local a a=d q[a]=q[a](q[a+1]);end end else do if not(w<39)then do if(w>39)then local a a=d q[a]=q[a](bd(q,a+1,z));else q[d]=b[f[z]];end end else e[p]=bl[r];p=z;end end end else if not(w>46)then if not(w<45)then do if(w<46)then q[d]=q[z][f[u[95]]];else local a a=d q[a]=q[a]();end end else b[f[z]]=q[d];end else if not(w<49)then if(w>49)then do q[s]=(function()q[d]=bj(g[u[82]],nil,b);end)end else q[d]=q[u[14]];end else do if(w>47)then local a,b b=z a=q[b]for c=(b+1),t do a=(a..q[c]);end;q[d]=a;else p=((f[d]<q[t])and z or p)end end end end end end end p=(p+1);end;end;end end end else if ba<=1128 then if ba>1106 then ch=function()local a,b,c,d,e,f,g,i=86,32,77,13,31,25,74,98,19,34,35,15,98,91,19,81,53,41,21 while a~=39 do if b<=164 then if b>=102 then if b<=102 then g=cl()b=126 else if b<160 then do if((e==0 and g==0))then do return 0 end end end b=164 else c=((-1)^bm(n,g,1))b=213 end end else if b<71 then b=75 c,d,e,f,g,i=nil else e=cl()b=102 end end else if b<=309 then if b>=262 then if b>264 then b=338 i=1 else b=309 do d=(bm(0,g,20)*4294967296+e)end end else b=262 f=bm(20,g,11)end else if b>=353 then if b>357 then a=39;else b=384 return(c*(2^(f-1023))*(d/bv+i))end else b=353 if not(f~=0)then if 0~=d then f=1 i=0 else return(c*0)end elseif not(f==2047)then else if not(d~=0)then do do return(c*(0/0))end end else return(c*(l/0))end end end end end end end ba=1160 else bu=function()local a,b a,b=br(bp,ci,(ci+2))ci=(ci+2);return((b*256)+a);end ba=1128 end else if ba>=1191 then if ba<1223 then cd=function(...)return{...},bs('#',...)end ba=1229 else bl={}ba=1276 end else bo=function(a,a,a,a)local a,b,c,d=55,39,12,25,38,41,32,52,73,44,96,28,32,99 while a~=30 do if b<=84 then if b<=39 then c,d=nil b=63 else if b<82 then d=cl()b=84 else b=126 do c=bp:sub(ci,(ci+d-1))end end end else if b>=170 then if b>178 then a=30;else b=188 return c;end else ci=(ci+d);b=170 end end end end ba=1191 end end end else if ba<=901 then if ba<=798 then if ba<794 then ba=798 bn=h else bv=(2^52)ba=842 end else if ba<=842 then bx={[0]=1}ba=866 else if ba<896 then bq=2 ba=901 else do for a=1,31 do bx[a]=bq bq=(bq*2)end end ba=928 end end end else if ba>=1028 then if ba<=1028 then ba=1047 ci=1 else if ba<1078 then ba=1080 do cl=function()local a,b,c,d b,a,c,d=br(bp,ci,(ci+3))ci=(ci+4);return((d*16777216)+(c*65536)+(a*256)+b);end end else ba=1102 cj=function()local a a=br(bp,ci,ci)ci=(ci+1);return a;end end end else if ba>=954 then if ba>960 then cb=function(a,b,c,d,d)local d d=((a/2^(b-1))%2^((c-1)-(b-1)+1))return(d-d%1);end ba=1028 else ba=1003 bw=(bit_lib and bit_lib.bxor or function(a,b)a=a%(2^32)b=b%(2^32)local c,d=0,1 while a>0 and b>0 do local e,f=a%16,b%16 c=c+bk[e+1][f+1]*d a=(a-e)/16 b=(b-f)/16 d=d*16 end c=c+a*d+b*d return c end)end else ba=954 do bm=function(a,b,c,d)local d,e,f=42,67,44,71,89,34,18,11,82,64,55,75 while d~=25 do if e<=136 then if e>=114 then if e>119 then f=((b/bx[a])%bx[c])e=181 else e=136 f=nil end else e=114 f=nil end else if e>=219 then if e>225 then d=25;else e=243 do return f end end else e=219 do f=(f-f%1)end end end end end end end end end end end end end)(12,4,7,1,20,7,5,'',14,0,24,1,15,31,13,6,1,33,14,119,116,142,122,95,0)
