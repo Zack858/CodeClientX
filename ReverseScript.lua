@@ -1,4 +1,4 @@
--- Reverse Time GUI with Optimized History, Shadow, Sound, Blur
+-- Reverse Time GUI with Smart Reset, Blur, Trail, Sound, Shadow
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -6,7 +6,7 @@ local Debris = game:GetService("Debris")
 local Lighting = game:GetService("Lighting")
 local lp = Players.LocalPlayer
 
--- GUI setup
+-- GUI
 local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
 gui.Name = "ReverseTimeGUI"
 
@@ -31,7 +31,7 @@ button.TextSize = 14
 
 Instance.new("UICorner", button).CornerRadius = UDim.new(0, 8)
 
--- Forsaken Sound
+-- Forsaken sound
 local sound = workspace:FindFirstChild("c00lk1dForsakenSound")
 if not sound then
 	sound = Instance.new("Sound")
@@ -43,26 +43,26 @@ if not sound then
 	sound.Parent = workspace
 end
 
--- Blur effect
+-- Blur
 local blur = Instance.new("BlurEffect")
 blur.Size = 0
 blur.Parent = Lighting
 
--- Rewind settings
+-- Settings
 local history = {}
-local rewindDuration = 5 -- seconds
+local rewindDuration = 5
 local interval = 0.05
 local tweenSpeed = 0.03
 local isRewinding = false
-local maxHistory = math.floor(rewindDuration / interval) -- 100 frames
+local maxHistory = math.floor(rewindDuration / interval)
 
--- Get HRP safely
+-- Get HRP
 local function getHRP()
 	local char = lp.Character or lp.CharacterAdded:Wait()
 	return char:WaitForChild("HumanoidRootPart", 10)
 end
 
--- Trail effect
+-- Trail
 local function createTrail(hrp)
 	if hrp:FindFirstChild("Trail") then return end
 	local a0 = Instance.new("Attachment", hrp)
@@ -76,7 +76,7 @@ local function createTrail(hrp)
 	trail.Enabled = false
 end
 
--- Shadow Clone
+-- Shadow
 local function spawnShadow()
 	local char = lp.Character
 	if not char then return end
@@ -97,13 +97,12 @@ local function spawnShadow()
 	Debris:AddItem(clone, 3)
 end
 
--- Auto-record position history
+-- Auto-record
 task.spawn(function()
 	while true do
 		local hrp = getHRP()
 		if hrp and not isRewinding then
 			table.insert(history, 1, {cf = hrp.CFrame})
-			-- Limit history to prevent lag
 			while #history > maxHistory do
 				table.remove(history)
 			end
@@ -112,7 +111,7 @@ task.spawn(function()
 	end
 end)
 
--- Reverse logic
+-- Reverse
 local function reverseTime()
 	local hrp = getHRP()
 	if not hrp or #history < 5 then return end
@@ -141,10 +140,18 @@ local function reverseTime()
 	if trail then trail.Enabled = false end
 	blur.Size = 0
 	isRewinding = false
-	-- history is NOT cleared (so it keeps recording forever)
+
+	-- Clear and restart fresh
+	history = {}
+	task.delay(0.1, function()
+		local hrp = getHRP()
+		if hrp then
+			table.insert(history, 1, {cf = hrp.CFrame})
+		end
+	end)
 end
 
--- Reverse button click
+-- Button
 button.MouseButton1Click:Connect(function()
 	if not isRewinding then
 		sound:Stop()
@@ -154,7 +161,7 @@ button.MouseButton1Click:Connect(function()
 	end
 end)
 
--- Reapply trail on respawn
+-- Respawn trail
 lp.CharacterAdded:Connect(function(char)
 	task.wait(1)
 	local hrp = char:WaitForChild("HumanoidRootPart", 10)
