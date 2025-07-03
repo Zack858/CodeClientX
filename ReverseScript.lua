@@ -1,4 +1,4 @@
--- Reverse Time GUI with c00lk1d Forsaken Sound | Delta-Compatible
+-- Reverse Time GUI with Rounded Corners and LOUD c00lk1d Sound (Delta-Compatible)
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -9,27 +9,35 @@ local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
 gui.Name = "ReverseTimeGUI"
 
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 220, 0, 80)
+frame.Size = UDim2.new(0, 150, 0, 50)
 frame.Position = UDim2.new(0, 30, 0, 130)
 frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-frame.BorderSizePixel = 2
+frame.BorderSizePixel = 0
 frame.Active = true
 frame.Draggable = true
 
+local frameCorner = Instance.new("UICorner", frame)
+frameCorner.CornerRadius = UDim.new(0, 12)
+
 local button = Instance.new("TextButton", frame)
-button.Size = UDim2.new(1, -20, 0, 40)
-button.Position = UDim2.new(0, 10, 0, 20)
-button.Text = "🔁 Reverse Time"
+button.Size = UDim2.new(1, -20, 0, 30)
+button.Position = UDim2.new(0, 10, 0, 10)
+button.Text = "🔁 Reverse"
 button.TextColor3 = Color3.new(1, 1, 1)
 button.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
 button.Font = Enum.Font.GothamBold
-button.TextSize = 16
+button.TextSize = 14
 
--- Sound
-local sound = Instance.new("Sound", game:GetService("SoundService"))
-sound.SoundId = "rbxassetid://1837635124" -- c00lk1d Forsaken-style
-sound.Volume = 2
+local buttonCorner = Instance.new("UICorner", button)
+buttonCorner.CornerRadius = UDim.new(0, 8)
+
+-- LOUD Sound
+local sound = Instance.new("Sound", game:GetService("Workspace")) -- use Workspace for guaranteed playback
+sound.SoundId = "rbxassetid://1837635124"
+sound.Volume = 10 -- max volume
 sound.Name = "c00lk1dForsakenSound"
+sound.Looped = false
+sound.PlayOnRemove = false
 
 -- Blur
 local blur = Instance.new("BlurEffect")
@@ -38,7 +46,7 @@ blur.Parent = game:GetService("Lighting")
 
 -- Settings
 local history = {}
-local rewindDuration = 3
+local rewindDuration = 5
 local interval = 0.05
 local tweenSpeed = 0.03
 local isRewinding = false
@@ -50,7 +58,7 @@ local function getHRP()
 	return hrp
 end
 
--- Create Trail VFX
+-- Create Trail
 local function createTrail(hrp)
 	if hrp:FindFirstChild("Trail") then return end
 	local a0 = Instance.new("Attachment", hrp)
@@ -64,7 +72,7 @@ local function createTrail(hrp)
 	trail.Enabled = false
 end
 
--- Record movement
+-- Record loop
 task.spawn(function()
 	while true do
 		local hrp = getHRP()
@@ -82,11 +90,10 @@ end)
 local function reverseTime()
 	local hrp = getHRP()
 	if not hrp then return end
-
 	createTrail(hrp)
 	local trail = hrp:FindFirstChildOfClass("Trail")
-	if trail then trail.Enabled = true end
 
+	if trail then trail.Enabled = true end
 	blur.Size = 20
 	isRewinding = true
 
@@ -107,15 +114,17 @@ local function reverseTime()
 	isRewinding = false
 end
 
--- Button click
+-- Button Click with sound restart fix
 button.MouseButton1Click:Connect(function()
 	if not isRewinding then
-		sound:Play()
+		sound:Stop()          -- stop sound if playing
+		sound.TimePosition = 0 -- rewind to start
+		sound:Play()          -- play fresh
 		reverseTime()
 	end
 end)
 
--- Setup trail after respawn
+-- Respawn handler
 lp.CharacterAdded:Connect(function(char)
 	task.wait(1)
 	local hrp = char:WaitForChild("HumanoidRootPart", 5)
