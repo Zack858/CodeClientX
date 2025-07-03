@@ -1,4 +1,4 @@
--- Reverse Time GUI with Shadow Clone, Trail, Blur, Forsaken Sound (Fully Fixed)
+-- Reverse Time GUI with Optimized History, Shadow, Sound, Blur
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -31,7 +31,7 @@ button.TextSize = 14
 
 Instance.new("UICorner", button).CornerRadius = UDim.new(0, 8)
 
--- Forsaken Sound (fixed)
+-- Forsaken Sound
 local sound = workspace:FindFirstChild("c00lk1dForsakenSound")
 if not sound then
 	sound = Instance.new("Sound")
@@ -43,17 +43,18 @@ if not sound then
 	sound.Parent = workspace
 end
 
--- Blur setup
+-- Blur effect
 local blur = Instance.new("BlurEffect")
 blur.Size = 0
 blur.Parent = Lighting
 
 -- Rewind settings
 local history = {}
-local rewindDuration = 5
+local rewindDuration = 5 -- seconds
 local interval = 0.05
 local tweenSpeed = 0.03
 local isRewinding = false
+local maxHistory = math.floor(rewindDuration / interval) -- 100 frames
 
 -- Get HRP safely
 local function getHRP()
@@ -96,13 +97,14 @@ local function spawnShadow()
 	Debris:AddItem(clone, 3)
 end
 
--- Start recording position history
+-- Auto-record position history
 task.spawn(function()
 	while true do
 		local hrp = getHRP()
 		if hrp and not isRewinding then
 			table.insert(history, 1, {cf = hrp.CFrame})
-			while #history > (rewindDuration / interval) do
+			-- Limit history to prevent lag
+			while #history > maxHistory do
 				table.remove(history)
 			end
 		end
@@ -139,10 +141,10 @@ local function reverseTime()
 	if trail then trail.Enabled = false end
 	blur.Size = 0
 	isRewinding = false
-	history = {} -- Clear after rewind
+	-- history is NOT cleared (so it keeps recording forever)
 end
 
--- Button click
+-- Reverse button click
 button.MouseButton1Click:Connect(function()
 	if not isRewinding then
 		sound:Stop()
@@ -152,7 +154,7 @@ button.MouseButton1Click:Connect(function()
 	end
 end)
 
--- Trail on respawn
+-- Reapply trail on respawn
 lp.CharacterAdded:Connect(function(char)
 	task.wait(1)
 	local hrp = char:WaitForChild("HumanoidRootPart", 10)
