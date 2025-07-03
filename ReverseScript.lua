@@ -1,4 +1,4 @@
--- Reverse Time GUI with Shadow Clone, Trail, Blur, and Forsaken Sound
+-- Reverse Time GUI with Shadow Clone, Trail, Blur, Forsaken Sound (Fully Fixed)
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -31,13 +31,17 @@ button.TextSize = 14
 
 Instance.new("UICorner", button).CornerRadius = UDim.new(0, 8)
 
--- Sound setup
-local sound = Instance.new("Sound", workspace)
-sound.SoundId = "rbxassetid://1837635124" -- Forsaken sound
-sound.Volume = 10
-sound.Name = "c00lk1dForsakenSound"
-sound.Looped = false
-sound.PlayOnRemove = false
+-- Forsaken Sound (fixed)
+local sound = workspace:FindFirstChild("c00lk1dForsakenSound")
+if not sound then
+	sound = Instance.new("Sound")
+	sound.Name = "c00lk1dForsakenSound"
+	sound.SoundId = "rbxassetid://1837635124"
+	sound.Volume = 10
+	sound.Looped = false
+	sound.PlayOnRemove = false
+	sound.Parent = workspace
+end
 
 -- Blur setup
 local blur = Instance.new("BlurEffect")
@@ -51,13 +55,13 @@ local interval = 0.05
 local tweenSpeed = 0.03
 local isRewinding = false
 
--- Get HumanoidRootPart
+-- Get HRP safely
 local function getHRP()
 	local char = lp.Character or lp.CharacterAdded:Wait()
-	return char:WaitForChild("HumanoidRootPart", 5)
+	return char:WaitForChild("HumanoidRootPart", 10)
 end
 
--- Trail visual
+-- Trail effect
 local function createTrail(hrp)
 	if hrp:FindFirstChild("Trail") then return end
 	local a0 = Instance.new("Attachment", hrp)
@@ -71,23 +75,11 @@ local function createTrail(hrp)
 	trail.Enabled = false
 end
 
--- Auto record position history
-task.spawn(function()
-	while true do
-		local hrp = getHRP()
-		if hrp and not isRewinding then
-			table.insert(history, 1, {cf = hrp.CFrame})
-			while #history > (rewindDuration / interval) do
-				table.remove(history)
-			end
-		end
-		task.wait(interval)
-	end
-end)
-
--- Shadow clone effect
+-- Shadow Clone
 local function spawnShadow()
-	local clone = lp.Character:Clone()
+	local char = lp.Character
+	if not char then return end
+	local clone = char:Clone()
 	for _, part in ipairs(clone:GetDescendants()) do
 		if part:IsA("BasePart") then
 			part.Anchored = true
@@ -101,16 +93,30 @@ local function spawnShadow()
 	end
 	clone.Name = "ShadowClone"
 	clone.Parent = workspace
-	Debris:AddItem(clone, 3) -- auto-delete
+	Debris:AddItem(clone, 3)
 end
+
+-- Start recording position history
+task.spawn(function()
+	while true do
+		local hrp = getHRP()
+		if hrp and not isRewinding then
+			table.insert(history, 1, {cf = hrp.CFrame})
+			while #history > (rewindDuration / interval) do
+				table.remove(history)
+			end
+		end
+		task.wait(interval)
+	end
+end)
 
 -- Reverse logic
 local function reverseTime()
 	local hrp = getHRP()
-	if not hrp then return end
+	if not hrp or #history < 5 then return end
 
 	createTrail(hrp)
-	spawnShadow() -- Add shadow here
+	spawnShadow()
 
 	local trail = hrp:FindFirstChildOfClass("Trail")
 	if trail then trail.Enabled = true end
@@ -133,7 +139,6 @@ local function reverseTime()
 	if trail then trail.Enabled = false end
 	blur.Size = 0
 	isRewinding = false
-
 	history = {} -- Clear after rewind
 end
 
@@ -147,9 +152,9 @@ button.MouseButton1Click:Connect(function()
 	end
 end)
 
--- Reapply trail on respawn
+-- Trail on respawn
 lp.CharacterAdded:Connect(function(char)
 	task.wait(1)
-	local hrp = char:WaitForChild("HumanoidRootPart", 5)
+	local hrp = char:WaitForChild("HumanoidRootPart", 10)
 	if hrp then createTrail(hrp) end
 end)
