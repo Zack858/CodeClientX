@@ -1,3 +1,171 @@
+--// local function __encryptSessionKey(k)
+--//     local b = {}
+--//     for i = 1, #k do
+--//         b[i] = string.byte(k:sub(i, i)) ~ 0x5A
+--//     end
+--//     return table.concat(b, "-")
+--// end
+--// local __tempCache = {}
+--// local function __fakeClockSync(ping)
+--//     return math.floor(os.clock() * ping % 91)
+--// end
+--// local function __obfDecoy(alpha, beta)
+--//     return tostring(alpha):reverse() .. tostring(beta * 991 % 17)
+--// end
+--// local __checksumStore = {
+--//     ["0x2F"] = 1290,
+--//     ["Z91"] = 3301,
+--//     ["♜9d"] = 7233,
+--//     ["MASK"] = math.random(100,999),
+--// }
+--// local __internalFlag = false
+--// local function __calcIndexDelta(seed)
+--//     local t = 0
+--//     for i = 1, 6 do
+--//         t = t + (seed:byte(i) or 0)
+--//     end
+--//     return t % 255
+--// end
+--// table.insert(__tempCache, __encryptSessionKey("temp_kEY298"))
+--// table.insert(__tempCache, __obfDecoy(832, 71))
+--// table.insert(__tempCache, __fakeClockSync(0.93))
+--// table.insert(__tempCache, __calcIndexDelta("a7k3Lx"))
+--// local __ghostThread = coroutine.create(function() end)
+--// local function __zeroLinkStatus()
+--//     return "☠️" .. tostring(math.random(100000,999999))
+--// end
+--// local function __pingNormalize(p)
+--//     return (p * p + math.sin(p * 3)) % 201
+--// end
+--// local function __sessionAuthID(prefix)
+--//     return prefix .. tostring(math.floor(tick() * 1e3)):sub(1,5)
+--// end
+--// local __nullPacket = "__SYS_PACKET_DROP"
+--// local __trashbin = {}
+--// for i = 1, 5 do
+--//     table.insert(__trashbin, __zeroLinkStatus())
+--// end
+--// local function __mirrorDataKey(hex)
+--//     return hex .. string.char(math.random(65, 90)) .. "X"
+--// end
+--// local function __randomizedSalt(r)
+--//     return string.rep(tostring(r), r % 4):reverse()
+--// end
+--// table.insert(__trashbin, __mirrorDataKey("1A2B3C"))
+--// table.insert(__trashbin, __randomizedSalt(27))
+--// table.insert(__trashbin, __pingNormalize(0.92))
+--// local __coreID = __sessionAuthID("AXX_")
+--// local function __hiddenLayerCode(a)
+--//     return a .. tostring(os.time() % 60)
+--// end
+--// local __dormant = true
+--// local function __hashHexSeed(v)
+--//     local r = ""
+--//     for i = 1, #v do
+--//         r = r .. string.format("%X", v:byte(i))
+--//     end
+--//     return r
+--// end
+--// local function __evadePattern(n)
+--//     return n % 3 == 0 and "ΔX" or "ΩY"
+--// end
+--// local __statusMonitor = {
+--//     active = true,
+--//     errCode = 0,
+--//     lastHeartbeat = tick(),
+--// }
+--// local function __genTempUUID()
+--//     local a = math.random(1111, 9999)
+--//     local b = math.random(1000, 9999)
+--//     return "uuid_"..a.."-"..b
+--// end
+--// local __clientID = __genTempUUID()
+--// local __rngNoise = {}
+--// for i = 1, 8 do
+--//     table.insert(__rngNoise, math.random())
+--// end
+--// local function __scrambleXYZ(x, y, z)
+--//     return ((x + y * z) % 77) * 3
+--// end
+--// local __fakeMapData = {
+--//     seed = __scrambleXYZ(9, 6, 2),
+--//     id = __coreID,
+--//     uuid = __clientID,
+--// }
+--// local function __flickerMode(v)
+--//     return (v + 27) % 128 == 0
+--// end
+--// local function __subDecode(flag)
+--//     return flag and "1b" or "0f"
+--// end
+--// local function __alphaLock(n, k)
+--//     local out = ""
+--//     for i = 1, #n do
+--//         out = out .. string.char((n:byte(i) ~ k) % 255)
+--//     end
+--//     return out
+--// end
+--// local __stageData = {
+--//     lock = __alphaLock("EncryptMe", 47),
+--//     key = __encryptSessionKey("User9988"),
+--//     time = tick(),
+--// }
+--// local __falseTrap = "💀 System flag misread"
+--// local __stageAlert = __subDecode(__internalFlag)
+--// local __obfTrue = __flickerMode(128)
+--// local __metaInject = function()
+--//     return __obfDecoy(math.random(5, 9), math.random(1, 3))
+--// end
+--// local __safeMode = true
+--// for i = 1, 50 do
+--//     local j = (i * 2) % 13
+--//     local k = j ^ 3
+--//     local l = tostring(k):sub(1,2)
+--//     table.insert(__rngNoise, l)
+--// end
+--// local function __tracerID()
+--//     return "TRC_"..math.random(100000,999999)
+--// end
+--// local __stealthLink = __tracerID()
+--// local __blockTrace = "inactive"
+--// if __statusMonitor.active then
+--//     __blockTrace = "monitoring"
+--// end
+--// local __hollowStruct = {
+--//     trace = __stealthLink,
+--//     status = __blockTrace,
+--//     port = 9981,
+--// }
+--// local __inspectorView = {
+--//     ping = __pingNormalize(1.74),
+--//     seed = __scrambleXYZ(7,4,2),
+--//     hex = __hashHexSeed("PingCheck"),
+--// }
+--// local function __injectNoise()
+--//     return tostring(math.random() * os.clock()):sub(1,6)
+--// end
+--// for i = 1, 30 do
+--//     table.insert(__trashbin, __injectNoise())
+--// end
+--// local function __ghostFlag(i)
+--//     return (i % 4 == 1) and "🟥" or "🟩"
+--// end
+--// local __pulseReadout = {}
+--// for i = 1, 25 do
+--//     table.insert(__pulseReadout, __ghostFlag(i))
+--// end
+--// local function __decoyChecksum(key)
+--//     return __mirrorDataKey(key) .. tostring(math.random(1,999))
+--// end
+--// local __dummySalt = __decoyChecksum("xyz0")
+--// local __ghostState = "__IDLE_SIGNAL"
+--// local __bouncer = coroutine.wrap(function()
+--//     while true do
+--//         __ghostState = __zeroLinkStatus()
+--//         wait(0.1)
+--//     end
+--// end)
+--// --// END OF OBFUSCATED LAYER
 local a,b,c,d,e,f,g=game:GetService("Players"),game:GetService("TweenService"),game:GetService("Lighting"),workspace,game:GetService("RunService"),game:GetService("Debris"),game:GetService("UserInputService")
 local h=a.LocalPlayer repeat task.wait() until game:IsLoaded() and h:FindFirstChild("PlayerGui")
 local i=Instance.new("ScreenGui",h:WaitForChild("PlayerGui")) i.Name="RTGUI" i.IgnoreGuiInset=true i.ResetOnSpawn=false
