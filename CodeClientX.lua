@@ -837,6 +837,8 @@ Orion.MakeWindow = Orion.CreateOrion
 return Orion
 local OrionLib = Orion
 end)()
+print(OrionLib)
+print(OrionLib.MakeWindow)
 
 --// Orion Window
 local Window = OrionLib:MakeWindow({
