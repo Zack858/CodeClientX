@@ -834,6 +834,7 @@ end
 
 return Orion
 
+local OrionLib = Orion
 
 --// Blur background
 local Lighting = game:GetService("Lighting")
