@@ -1,3 +1,4 @@
+local OrionLib = (function()
 local Orion = {}
 
 function Orion:CreateOrion(orionName)
@@ -834,7 +835,7 @@ end
 
 return Orion
 local OrionLib = Orion
-
+end)()
 
 --// Blur background
 local Lighting = game:GetService("Lighting")
