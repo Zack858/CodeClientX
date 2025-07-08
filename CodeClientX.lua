@@ -833,6 +833,7 @@ function Orion:CreateOrion(orionName)
     return SectionHandler
 end 
 
+Orion.MakeWindow = Orion.CreateOrion
 return Orion
 local OrionLib = Orion
 end)()
