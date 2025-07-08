@@ -837,60 +837,6 @@ return Orion
 local OrionLib = Orion
 end)()
 
---// Blur background
-local Lighting = game:GetService("Lighting")
-local blur = Instance.new("BlurEffect", Lighting)
-blur.Size = 10
-
---// Toggle Button GUI
-local Players = game:GetService("Players")
-local UIS = game:GetService("UserInputService")
-local lp = Players.LocalPlayer
-local pg = lp:WaitForChild("PlayerGui")
-
-local toggleGui = Instance.new("ScreenGui", pg)
-toggleGui.Name = "CodeClientX_Toggle"
-toggleGui.ResetOnSpawn = false
-
-local toggleBtn = Instance.new("TextButton", toggleGui)
-toggleBtn.Size = UDim2.new(0, 160, 0, 40)
-toggleBtn.Position = UDim2.new(0, 20, 0.7, 0)
-toggleBtn.Text = "CodeClientX V1"
-toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 153, 204)
-toggleBtn.TextColor3 = Color3.new(1, 1, 1)
-toggleBtn.Font = Enum.Font.GothamBold
-toggleBtn.TextSize = 18
-toggleBtn.AutoButtonColor = true
-toggleBtn.Draggable = false
-toggleBtn.Active = true
-toggleBtn.ZIndex = 99
-
--- Rounded corners
-local corner = Instance.new("UICorner", toggleBtn)
-corner.CornerRadius = UDim.new(0, 10)
-
--- Drag support
-local dragging, offset
-toggleBtn.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-		dragging = true
-		offset = input.Position - toggleBtn.AbsolutePosition
-	end
-end)
-
-UIS.InputChanged:Connect(function(input)
-	if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-		local pos = UDim2.new(0, input.Position.X - offset.X, 0, input.Position.Y - offset.Y)
-		toggleBtn.Position = pos
-	end
-end)
-
-UIS.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-		dragging = false
-	end
-end)
-
 --// Orion Window
 local Window = OrionLib:MakeWindow({
 	Name = "🌊 CodeClientX | Hub",
@@ -971,6 +917,60 @@ ShopTab:AddButton({Name = "🎪 Show Traveling Merchants", Callback = function()
 		if m then m.Enabled = not m.Enabled end
 	end
 end})
+
+--// Blur background
+local Lighting = game:GetService("Lighting")
+local blur = Instance.new("BlurEffect", Lighting)
+blur.Size = 10
+
+--// Toggle Button GUI
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local lp = Players.LocalPlayer
+local pg = lp:WaitForChild("PlayerGui")
+
+local toggleGui = Instance.new("ScreenGui", pg)
+toggleGui.Name = "CodeClientX_Toggle"
+toggleGui.ResetOnSpawn = false
+
+local toggleBtn = Instance.new("TextButton", toggleGui)
+toggleBtn.Size = UDim2.new(0, 160, 0, 40)
+toggleBtn.Position = UDim2.new(0, 20, 0.7, 0)
+toggleBtn.Text = "CodeClientX V1"
+toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 153, 204)
+toggleBtn.TextColor3 = Color3.new(1, 1, 1)
+toggleBtn.Font = Enum.Font.GothamBold
+toggleBtn.TextSize = 18
+toggleBtn.AutoButtonColor = true
+toggleBtn.Draggable = false
+toggleBtn.Active = true
+toggleBtn.ZIndex = 99
+
+-- Rounded corners
+local corner = Instance.new("UICorner", toggleBtn)
+corner.CornerRadius = UDim.new(0, 10)
+
+-- Drag support
+local dragging, offset
+toggleBtn.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		offset = input.Position - toggleBtn.AbsolutePosition
+	end
+end)
+
+UIS.InputChanged:Connect(function(input)
+	if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+		local pos = UDim2.new(0, input.Position.X - offset.X, 0, input.Position.Y - offset.Y)
+		toggleBtn.Position = pos
+	end
+end)
+
+UIS.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = false
+	end
+end)
 
 --// Main loop
 task.spawn(function()
