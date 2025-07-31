@@ -1,2 +1,1 @@
-print("https://pornhub.com") until true
--- gtfo
+print("https://pornhub.com") until false
