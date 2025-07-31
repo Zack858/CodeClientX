@@ -1,1 +1,3 @@
-print("https://pornhub.com") until false
+while true do
+    print("https://pornhub.com")
+end
